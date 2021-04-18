@@ -45,7 +45,7 @@ router.post('/registration',
 router.post('/login', async (req, res) => {
     try{
         const {login, password} = req.body;
-        const user = await User.findOne({login})
+        const user = await User.findOne({login});
         if(!user){
             return res.status(404).json({message: "Пользователь с таким логином не найден"});
         }
@@ -63,7 +63,8 @@ router.post('/login', async (req, res) => {
                 login: user.login,
                 email: user.email,
                 avatar: user.avatar
-            }
+            },
+            message: "Вы вошли"
         });
     }catch(e){
         console.log(e);
