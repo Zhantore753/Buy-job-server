@@ -5,10 +5,16 @@ const Ticket = require('../models/Ticket');
 
 router.post('', authMiddleware, async (req, res) => {
     try{
-        const {title, description} = req.body;
-        const ticket = new Ticket({user: req.user.id, title, description});
+        const {title, description, date} = req.body;
+        let body;
+        if(date){
+            body = {user: req.user.id, title, description, date};
+        }else{
+            body = {user: req.user.id, title, description}
+        }
+        const ticket = new Ticket(body);
         await ticket.save();
-        return res.json({message: 'Тикет успешно создан'});
+        return res.json(ticket);
     }catch(e){
         console.log(e);
         return res.status(400).json({message: "Ошибка сервера"})
@@ -18,7 +24,7 @@ router.post('', authMiddleware, async (req, res) => {
 router.get('', authMiddleware, async (req, res) => {
     try{
         const {startfrom} = req.query;
-        const response = await Ticket.find({user: req.user.id}).skip(+startfrom).limit(10);
+        const response = await Ticket.find({user: req.user.id}).skip(+startfrom).limit(10).sort({'date': -1});
         return res.json(response);
     }catch(e){
         console.log(e);
