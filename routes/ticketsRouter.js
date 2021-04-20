@@ -14,11 +14,10 @@ router.post('', authMiddleware, async (req, res) => {
         return res.status(400).json({message: "Ошибка сервера"})
     }
 });
+
 router.get('', authMiddleware, async (req, res) => {
     try{
-        console.log(req.query);
         const {startfrom} = req.query;
-        console.log(startfrom);
         const response = await Ticket.find({user: req.user.id}).skip(+startfrom).limit(10);
         return res.json(response);
     }catch(e){
