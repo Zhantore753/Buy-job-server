@@ -84,6 +84,8 @@ router.get('/auth',
                     id: user.id,
                     login: user.login,
                     email: user.email,
+                    balance: user.balance,
+                    role: user.role,
                     avatar: user.avatar
                 }
             });

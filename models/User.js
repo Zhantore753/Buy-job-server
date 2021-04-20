@@ -13,7 +13,7 @@ const User = new Schema({
     balance: {type: Number,  default: 0},
     balanceHistory: [{type: ObjectId, ref: 'BalanceAction'}],
     rating: {type: Number, default: 0, max: 5},
-    role: {type: String, enum: ['admin', 'freelancer', 'customer'], required: true},
+    role: {type: String, enum: ['admin', 'moderator', 'freelancer', 'customer'], required: true},
     eduInstitution: {type: String},
     eduInstitutionEnd: {type: Number},
     eduFaculty: {type: String},

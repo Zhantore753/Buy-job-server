@@ -5,7 +5,7 @@ const Ticket = new Schema({
     title: {type: String, required: true},
     description: {type: String, required: true},
     date: {type: Date, default: Date.now()},
-    status: {type: String, enum: ['В процессе', 'Исполнено']}
+    status: {type: String, enum: ['В процессе', 'Исполнено'], default: 'В процессе'}
 });
 
 module.exports = model('Ticket', Ticket);
