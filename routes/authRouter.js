@@ -62,6 +62,8 @@ router.post('/login', async (req, res) => {
                 id: user.id,
                 login: user.login,
                 email: user.email,
+                balance: user.balance,
+                role: user.role,
                 avatar: user.avatar
             },
             message: "Вы вошли"
