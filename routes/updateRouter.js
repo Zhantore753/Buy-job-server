@@ -3,6 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Uuid = require('uuid');
+const {check, validationResult} = require("express-validator");
 const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -22,8 +23,17 @@ router.post('/avatar', authMiddleware, async (req, res) =>{
     }
 });
 
-router.post('/email', authMiddleware, async (req, res) =>{
+router.post('/email', authMiddleware, [
+        check('email', 'Неправильная почта').isEmail()
+    ], 
+    async (req, res) =>{
     try {
+        const {email} = req.body;
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({message: "Неверный запрос", errors});
+        }
+
         let candidate = await User.findOne({email});
         if(candidate){
             return res.status(400).json({message: `Пользователь с почтой ${email} уже зарегистрирован`})
