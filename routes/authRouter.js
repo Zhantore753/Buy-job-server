@@ -64,7 +64,14 @@ router.post('/login', async (req, res) => {
                 email: user.email,
                 balance: user.balance,
                 role: user.role,
-                avatar: user.avatar
+                avatar: user.avatar,
+                fullName: user.fullName,
+                rating: user.rating,
+                eduInstitution: user.eduInstitution,
+                eduFaculty: user.eduFaculty,
+                eduSpecialty: user.eduSpecialty,
+                eduCourse: user.eduCourse,
+                eduStatus: user.eduStatus
             },
             message: "Вы вошли"
         });
@@ -88,13 +95,21 @@ router.get('/auth',
                     email: user.email,
                     balance: user.balance,
                     role: user.role,
-                    avatar: user.avatar
+                    avatar: user.avatar,
+                    fullName: user.fullName,
+                    rating: user.rating,
+                    eduInstitution: user.eduInstitution,
+                    eduFaculty: user.eduFaculty,
+                    eduSpecialty: user.eduSpecialty,
+                    eduCourse: user.eduCourse,
+                    eduStatus: user.eduStatus
                 }
             });
         }catch(e){
             console.log(e);
             res.send({message: "Ошибка сервера"});
         }
-    });
+    }
+);
 
 module.exports = router;
