@@ -74,9 +74,9 @@ router.post('/password', authMiddleware, async (req, res) =>{
         console.log(newPassword, password);
 
         const isPassValid = bcrypt.compareSync(password, user.password);
-        // if(!isPassValid){
-        //     return res.status(400).json({message: "Неверный пароль"});
-        // }
+        if(!isPassValid){
+            return res.status(400).json({message: "Неверный пароль"});
+        }
         
         const hashPassword = await bcrypt.hash(newPassword, 8);
 
