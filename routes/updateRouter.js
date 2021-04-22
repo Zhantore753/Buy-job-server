@@ -41,7 +41,7 @@ router.post('/email', authMiddleware, [
         const user = await User.findById(req.user.id);
         user.email = req.body.email;
         await user.save();
-        return res.json({message: "Email успешно изменен"});
+        return res.json({user:{email: req.body.email}, message: "Email успешно изменен"});
     } catch (e) {
         console.log(e);
         return res.status(400).json({message: 'Ошибка при изменении email'});
