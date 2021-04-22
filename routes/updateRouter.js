@@ -2,6 +2,7 @@ const Router = require("express");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const fs = require('fs');
 const Uuid = require('uuid');
 const {check, validationResult} = require("express-validator");
 const router = new Router();
@@ -11,15 +12,36 @@ router.post('/avatar', authMiddleware, async (req, res) =>{
     try {
         const file = req.files.file;
         const user = await User.findById(req.user.id);
+        if(user.avatar){
+            fs.unlink(req.filePath + '/' + user.avatar, (e) => {
+                if (e) throw e;
+                console.log('File deleted!');
+            });
+        }
         const avatarName = Uuid.v4() + ".jpg";
         console.log(req.filePath);
         file.mv(req.filePath + "/" + avatarName);
         user.avatar = avatarName;
         await user.save();
-        return res.json({message: "Аватарка успешно изменена"});
+        return res.json({
+            user: {
+            id: user.id,
+            login: user.login,
+            email: user.email,
+            balance: user.balance,
+            role: user.role,
+            avatar: user.avatar,
+            fullName: user.fullName,
+            rating: user.rating,
+            eduInstitution: user.eduInstitution,
+            eduFaculty: user.eduFaculty,
+            eduSpecialty: user.eduSpecialty,
+            eduCourse: user.eduCourse,
+            eduStatus: user.eduStatus
+        },message: "Аватар успешно загружен"});
     } catch (e) {
         console.log(e);
-        return res.status(400).json({message: 'Ошибка при изменении автарки'});
+        return res.status(400).json({message: 'Ошибка при загрузки аватарки'});
     }
 });
 
