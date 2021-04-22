@@ -14,14 +14,14 @@ const User = new Schema({
     balanceHistory: [{type: ObjectId, ref: 'BalanceAction'}],
     rating: {type: Number, default: 0, max: 5},
     role: {type: String, enum: ['admin', 'moderator', 'freelancer', 'customer'], required: true},
-    eduInstitution: {type: String},
-    eduInstitutionEnd: {type: Number},
-    eduFaculty: {type: String},
-    eduSpecialty: {type: String},
-    eduCourse: {type: String},
-    eduStatus: {stype: String},
+    eduInstitution: {type: String, default:''},
+    eduInstitutionEnd: {type: Number, default:''},
+    eduFaculty: {type: String, default:''},
+    eduSpecialty: {type: String, default:''},
+    eduCourse: {type: String, default:''},
+    eduStatus: {type: String, default:''},
     orders: [{type: ObjectId, ref: 'Order'}],
-    tickets: [{type: ObjectId, red: 'Ticket'}]
+    tickets: [{type: ObjectId, ref: 'Ticket'}]
 });
 
 module.exports = model('User', User);
