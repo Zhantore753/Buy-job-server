@@ -51,9 +51,24 @@ router.post('/email', authMiddleware, [
 router.post('/fullname', authMiddleware, async (req, res) =>{
     try {
         const user = await User.findById(req.user.id);
-        user.fullname = req.body.fullname;
+        user.fullName = req.body.fullName;
         await user.save();
-        return res.json({message: "Имя было изменено"});
+        return res.json({
+            user: {
+            id: user.id,
+            login: user.login,
+            email: user.email,
+            balance: user.balance,
+            role: user.role,
+            avatar: user.avatar,
+            fullName: user.fullName,
+            rating: user.rating,
+            eduInstitution: user.eduInstitution,
+            eduFaculty: user.eduFaculty,
+            eduSpecialty: user.eduSpecialty,
+            eduCourse: user.eduCourse,
+            eduStatus: user.eduStatus
+        },message: "Имя было изменено"});
     } catch (e) {
         console.log(e);
         return res.status(400).json({message: 'Ошибка при изменении имени'});
@@ -70,7 +85,22 @@ router.post('/edu', authMiddleware, async (req, res) =>{
         eduCourse && (user.eduCourse = eduCourse);
         eduStatus && (user.eduStatus = eduStatus);
         await user.save();
-        return res.json({message: "Информация была изменена"});
+        return res.json({
+            user: {
+            id: user.id,
+            login: user.login,
+            email: user.email,
+            balance: user.balance,
+            role: user.role,
+            avatar: user.avatar,
+            fullName: user.fullName,
+            rating: user.rating,
+            eduInstitution: user.eduInstitution,
+            eduFaculty: user.eduFaculty,
+            eduSpecialty: user.eduSpecialty,
+            eduCourse: user.eduCourse,
+            eduStatus: user.eduStatus
+        }, message: "Информация была изменена"});
     } catch (e) {
         console.log(e);
         return res.status(400).json({message: 'Ошибка при изменении'});
