@@ -14,8 +14,8 @@ router.post('/avatar', authMiddleware, async (req, res) =>{
         const user = await User.findById(req.user.id);
         if(user.avatar){
             fs.unlink(req.filePath + '/' + user.avatar, (e) => {
-                if (e) throw e;
-                console.log('File deleted!');
+                if (e) console.log(e);
+                else console.log('File deleted!');
             });
         }
         const avatarName = Uuid.v4() + ".jpg";

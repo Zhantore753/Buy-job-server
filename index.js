@@ -5,6 +5,7 @@ const fileUpload = require('express-fileupload');
 const authRouter = require('./routes/authRouter');
 const ticketsRouter = require('./routes/ticketsRouter');
 const updateRouter = require('./routes/updateRouter');
+const orderRouter = require('./routes/orderRouter');
 const PORT = process.env.PORT || config.get('serverPort');
 const app = express();
 const corsMiddleware = require('./middleware/corsMiddleware');
@@ -13,12 +14,14 @@ const path = require('path');
 
 app.use(fileUpload({}));
 app.use(corsMiddleware);
-app.use(staticPathMiddleware(path.resolve(__dirname, 'static')));
+app.use(staticPathMiddleware(path.resolve(__dirname, 'files')));
 app.use(express.json());
-app.use(express.static('static'));
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static('files'));
 app.use("/api/auth", authRouter);
 app.use("/api/tickets", ticketsRouter);
 app.use("/api/update", updateRouter);
+app.use("/api/order", orderRouter);
 
 const start = async () => {
     try{
