@@ -75,7 +75,37 @@ router.get('/orders', authMiddleware, async (req, res) => {
         return res.json(response);
     }catch(e){
         console.log(e);
-        return res.status(500).json({message: "Не удалось получить тикеты"});
+        return res.status(500).json({message: "Не удалось получить заказы"});
+    }
+});
+
+router.get('/find-orders', authMiddleware, async (req, res) => {
+    try{
+        const {startfrom, category, search} = req.query;
+        let response;
+        if(category){
+            response = await Order.find({status: 'Участвует в конкурсе', category}).skip(+startfrom).limit(10).sort({'date': -1});
+        }else{
+            response = await Order.find({status: 'Участвует в конкурсе'}).skip(+startfrom).limit(10).sort({'date': -1});
+        }
+
+        if(search){
+            response = response.filter(order => {
+                let check = order.title.includes(search) || order.subject.includes(search)
+                let keyCheck = false;
+                for(let i = 0; i < order.keyWords.length; i++){
+                    if(order.keyWords.includes(search)){
+                        keyCheck = true;
+                        break;
+                    }
+                }
+                return check || keyCheck
+            });
+        }
+        return res.json(response);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Не удалось получить заказы"});
     }
 });
 
