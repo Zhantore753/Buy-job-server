@@ -2,11 +2,8 @@ const Router = require("express");
 const User = require("../models/User");
 const File = require('../models/File');
 const Order = require("../models/Order");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const fs = require('fs');
 const Uuid = require('uuid');
-const {check, validationResult} = require("express-validator");
 const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -19,7 +16,7 @@ router.post('/create', authMiddleware, async (req, res) =>{
             category,
             subject, 
             title, 
-            selectedDate, 
+            date: selectedDate, 
             price, 
             keyWords: keyWordsArr, 
             description, 
@@ -53,6 +50,17 @@ router.post('/create', authMiddleware, async (req, res) =>{
     } catch (e) {
         console.log(e);
         return res.status(400).json({message: 'Ошибка при создании заказа'});
+    }
+});
+
+router.get('/orders', authMiddleware, async (req, res) => {
+    try{
+        const {startfrom} = req.query;
+        const response = await Order.find({user: req.user.id}).skip(+startfrom).limit(10).sort({'date': -1});
+        return res.json(response);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Не удалось получить тикеты"});
     }
 });
 
