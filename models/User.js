@@ -21,6 +21,8 @@ const User = new Schema({
     eduCourse: {type: String, default:''},
     eduStatus: {type: String, default:''},
     orders: [{type: ObjectId, ref: 'Order'}],
+    claimedOrders: [{type: ObjectId, ref: 'Order'}],
+    completedOrders: [{type: ObjectId, ref: 'Order'}],
     tickets: [{type: ObjectId, ref: 'Ticket'}]
 });
 

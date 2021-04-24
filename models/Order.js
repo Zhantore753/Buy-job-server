@@ -3,6 +3,7 @@ const {Schema, model, ObjectId} = require('mongoose');
 const Order = new Schema({
     title: {type: String, required: true},
     description: {type: String, required: true},
+    deadline: {type: Date, default: Date.now()},
     date: {type: Date, default: Date.now()},
     price: {type: Number},
     keyWords: [{type: String}],

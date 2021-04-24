@@ -5,6 +5,7 @@ const Ticket = new Schema({
     title: {type: String, required: true},
     description: {type: String, required: true},
     date: {type: Date, default: Date.now()},
+    files: [{type: ObjectId, ref: 'File'}],
     status: {type: String, enum: ['В процессе', 'Исполнено'], default: 'В процессе'}
 });
 
