@@ -6,6 +6,7 @@ const authRouter = require('./routes/authRouter');
 const ticketsRouter = require('./routes/ticketsRouter');
 const updateRouter = require('./routes/updateRouter');
 const orderRouter = require('./routes/orderRouter');
+const userRouter = require('./routes/userRouter');
 const PORT = process.env.PORT || config.get('serverPort');
 const app = express();
 const corsMiddleware = require('./middleware/corsMiddleware');
@@ -22,6 +23,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/tickets", ticketsRouter);
 app.use("/api/update", updateRouter);
 app.use("/api/order", orderRouter);
+app.use("/api/user", userRouter);
 
 const start = async () => {
     try{
