@@ -12,12 +12,11 @@ router.get('/user', authMiddleware, async (req, res) => {
             avatar: user.avatar,
             email: user.email
         }
-        console.log(customer)
         return res.json({customer, message: "Все прошло успешно"});
     }catch(e){
         console.log(e);
         return res.status(400).json({message: "Ошибка сервера"});
     }
-})
+});
 
 module.exports = router;

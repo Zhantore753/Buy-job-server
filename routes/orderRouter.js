@@ -5,6 +5,7 @@ const Order = require("../models/Order");
 const Uuid = require('uuid');
 const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
+const fs = require('fs');
 
 router.post('/create', authMiddleware, async (req, res) =>{
     try {
@@ -106,6 +107,38 @@ router.get('/find-orders', authMiddleware, async (req, res) => {
     }catch(e){
         console.log(e);
         return res.status(500).json({message: "Не удалось получить заказы"});
+    }
+});
+
+router.get('/files', authMiddleware, async (req, res) => {
+    try{
+        let {files} = req.query;
+        files = files.split(',');
+
+        let fullFiles = [];
+        for(let i = 0; i < files.length; i++){
+            const file = await File.findOne({_id: files[i]});
+            fullFiles.push(file);
+        }
+        return res.json({fullFiles, message: "Файлы получены"});
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Не удалось получить файлы"});
+    }
+});
+
+router.get('/download', authMiddleware, async (req, res) => {
+    try {
+        const {path, name} = req.query;
+        console.log(path, name);
+        if (fs.existsSync(path)) {
+            const fullpath = path + "\\" + name;
+            return res.download(fullpath);
+        }
+        return res.status(400).json({message: "Ошибка при скачивании"});
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({message: "Ошибка при скачивании"});
     }
 });
 
