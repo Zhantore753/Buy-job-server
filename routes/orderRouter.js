@@ -6,6 +6,7 @@ const Uuid = require('uuid');
 const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const fs = require('fs');
+const Respond = require("../models/Respond");
 
 router.post('/create', authMiddleware, async (req, res) =>{
     try {
@@ -139,6 +140,40 @@ router.get('/download', authMiddleware, async (req, res) => {
     } catch (e) {
         console.log(e);
         res.status(500).json({message: "Ошибка при скачивании"});
+    }
+});
+
+router.post('/create-respond', authMiddleware, async (req, res) => {
+    try{
+        const {offer, order} = req.body;
+
+        const respond = new Respond({
+            executor: req.user.id,
+            offer: offer,
+            order: order
+        });
+
+        await respond.save();
+        res.json({offer, message: "Предложение было отправлено"});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка сервера"});
+    }
+});
+
+router.get('/find-respond', authMiddleware, async (req, res) => {
+    try{
+        const {orderId} = req.query;
+
+        const response = await Respond.findOne({executor: req.user.id, order: orderId})
+        if(response){
+            res.json({offer: response.offer, message: "Получено"});
+        }else{
+            res.json({offer: 0, message: "Получено"});
+        }
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка сервера"});
     }
 });
 
