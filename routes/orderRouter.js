@@ -165,7 +165,7 @@ router.get('/find-respond', authMiddleware, async (req, res) => {
     try{
         const {orderId} = req.query;
 
-        const response = await Respond.findOne({executor: req.user.id, order: orderId})
+        const response = await Respond.findOne({executor: req.user.id, order: orderId});
         if(response){
             res.json({offer: response.offer, message: "Получено"});
         }else{
@@ -174,6 +174,20 @@ router.get('/find-respond', authMiddleware, async (req, res) => {
     }catch(e){
         console.log(e);
         res.status(400).json({message: "Ошибка сервера"});
+    }
+});
+
+router.post('/update-order', authMiddleware, async (req, res) => {
+    try{
+        const {orderId, price, status} = req.body;
+        const order = await Order.findOne({_id: orderId});
+        order.price = price;
+        order.status = status;
+        await order.save();
+        res.json({message: "Изменения были сохранены"});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка при обновлении заказа"});
     }
 });
 
