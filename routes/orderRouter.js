@@ -145,16 +145,28 @@ router.get('/download', authMiddleware, async (req, res) => {
 
 router.post('/create-respond', authMiddleware, async (req, res) => {
     try{
-        const {offer, order} = req.body;
+        const {offer, order, respondId} = req.body;
 
-        const respond = new Respond({
-            executor: req.user.id,
-            offer: offer,
-            order: order
-        });
+        let respond;
+        if(respondId){
+            respond = await Respond.findOne({_id: respondId});
+            respond.offer = offer;
+        }else{
+            respond = new Respond({
+                executor: req.user.id,
+                offer: offer,
+                order: order
+            });
+        }
+        console.log(req.body);
+
+        const findOrder = await Order.findOne({_id: order});
+
+        findOrder.responds.push(respond._id);
 
         await respond.save();
-        res.json({offer, message: "Предложение было отправлено"});
+        await findOrder.save();
+        res.json({respond, message: "Предложение было отправлено"});
     }catch(e){
         console.log(e);
         res.status(400).json({message: "Ошибка сервера"});
@@ -165,11 +177,11 @@ router.get('/find-respond', authMiddleware, async (req, res) => {
     try{
         const {orderId} = req.query;
 
-        const response = await Respond.findOne({executor: req.user.id, order: orderId});
-        if(response){
-            res.json({offer: response.offer, message: "Получено"});
+        const respond = await Respond.findOne({executor: req.user.id, order: orderId});
+        if(respond){
+            res.json({respond, message: "Получено"});
         }else{
-            res.json({offer: 0, message: "Получено"});
+            res.json({message: "Предложения еще не было"});
         }
     }catch(e){
         console.log(e);
