@@ -205,4 +205,30 @@ router.post('/update-order', authMiddleware, async (req, res) => {
     }
 });
 
+router.get('/get-responds', authMiddleware, async (req, res) => {
+    try{
+        const {orderId} = req.query;
+        const order = await Order.findOne({_id: orderId});
+        let responds = [];
+        for(let i = 0; i < order.responds.length; i++){
+            const respond = await Respond.findOne({_id: order.responds[i]});
+            const user = await User.findOne({_id: respond.executor});
+            const newRespond = {
+                _id: respond._id,
+                offer: respond.offer,
+                executor: respond.executor,
+                messages: respond.messages,
+                userAvatar: user.avatar,
+                userFullName: user.fullName,
+                userEmail: user.email
+            }
+            responds.push(newRespond);
+        }
+        res.json({responds, message: "Отклики получены"});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка при получении откликов"});
+    }
+});
+
 module.exports = router;
