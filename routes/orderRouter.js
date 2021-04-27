@@ -131,7 +131,6 @@ router.get('/files', authMiddleware, async (req, res) => {
 router.get('/download', authMiddleware, async (req, res) => {
     try {
         const {path, name} = req.query;
-        console.log(path, name);
         if (fs.existsSync(path)) {
             const fullpath = path + "\\" + name;
             return res.download(fullpath);
@@ -158,11 +157,14 @@ router.post('/create-respond', authMiddleware, async (req, res) => {
                 order: order
             });
         }
-        console.log(req.body);
 
         const findOrder = await Order.findOne({_id: order});
 
-        findOrder.responds.push(respond._id);
+        if(findOrder.responds.includes(respond._id)){
+            console.log(findOrder.responds);
+        }else{
+            findOrder.responds.push(respond._id);
+        }
 
         await respond.save();
         await findOrder.save();
