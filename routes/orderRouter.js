@@ -7,6 +7,7 @@ const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const fs = require('fs');
 const Respond = require("../models/Respond");
+const Message = require("../models/Message");
 
 router.post('/create', authMiddleware, async (req, res) =>{
     try {
@@ -231,4 +232,19 @@ router.get('/get-responds', authMiddleware, async (req, res) => {
     }
 });
 
+router.get('/get-messages', authMiddleware, async(req, res) => {
+    try{
+        const {respondId} = req.query;
+        const respond = await Respond.findOne({_id: respondId});
+        let messages = [];
+        for(let i = 0; i < respond.messages.length; i++){
+            const message = await Message.findOne({_id: respond.messages[i]}).limit(70).sort({'time': -1});;
+            messages.push(message);
+        }
+        res.json({messages, message: "Сообщения получены"});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка при получении сообщений"});
+    }
+});
 module.exports = router;
