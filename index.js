@@ -39,8 +39,12 @@ app.use("/api/user", userRouter);
 io.on('connection', socket => {
     socket.on('ROOM:JOIN', (roomId) => {
         socket.join(roomId);
+        console.log(socket.rooms);
     });
-
+    socket.on('ROOM:LEAVE', (roomId) => {
+        socket.leave(roomId);
+        console.log(socket.rooms);
+    });
     socket.on('NEW_MESSAGE', async ({room, text, user, time, files}) => {
         const message = new Message({
             room,
