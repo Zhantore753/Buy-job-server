@@ -218,7 +218,6 @@ router.get('/get-responds', authMiddleware, async (req, res) => {
                 _id: respond._id,
                 offer: respond.offer,
                 executor: respond.executor,
-                messages: respond.messages,
                 userAvatar: user.avatar,
                 userFullName: user.fullName,
                 userEmail: user.email
@@ -251,4 +250,41 @@ router.get('/get-messages', authMiddleware, async(req, res) => {
         res.status(400).json({message: "Ошибка при получении сообщений"});
     }
 });
+
+router.post('/access-respond', authMiddleware, async(req, res) => {
+    try{
+        const {respondId} = req.body;
+        const respond = await Respond.findOne({_id: respondId});
+        const order = await Order.findOne({_id: respond.order});
+        order.executorRespond = respond._id;
+        await order.save();
+        res.json({order, message: 'Отклик был одобрен'});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
+    }
+})
+
+router.get('/get-respond', authMiddleware, async(req, res) => {
+    try{
+        const {respondId} = req.query;
+        const resRespond = await Respond.findOne({_id: respondId});
+        const user = await User.findOne({_id: resRespond.executor});
+
+        const respond = {
+            _id: resRespond._id,
+            offer: resRespond.offer,
+            executor: resRespond.executor,
+            userAvatar: user.avatar,
+            userFullName: user.fullName,
+            userEmail: user.email
+        }
+
+        res.json({respond});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
+    }
+});
+
 module.exports = router;
