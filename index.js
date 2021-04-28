@@ -39,6 +39,7 @@ app.use("/api/user", userRouter);
 io.on('connection', socket => {
     socket.on('ROOM:JOIN', (roomId) => {
         socket.join(roomId);
+        console.log(socket.rooms);
     });
 
     socket.on('NEW_MESSAGE', async ({room, text, user, time, files}) => {
@@ -56,6 +57,10 @@ io.on('connection', socket => {
         await respond.save();
 
         socket.broadcast.to(room).emit('NEW_MESSAGE', {room, text, user, time, files});
+    });
+
+    socket.on('disconnecting', () => {
+        // console.log(socket.rooms); // the Set contains at least the socket ID
     });
 
     socket.on('disconnect', () => {
