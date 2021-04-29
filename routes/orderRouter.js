@@ -237,9 +237,10 @@ router.get('/get-messages', authMiddleware, async(req, res) => {
         const respond = await Respond.findOne({_id: respondId});
         let messages = [];
         let start = 0;
-        if(respond.messages.length >= 70){
-            start = respond.messages.length - 70
+        if(respond.messages.length >= 10){
+            start = respond.messages.length - 10
         }
+        console.log(start);
         for(let i = start; i < respond.messages.length; i++){
             const message = await Message.findOne({_id: respond.messages[i]});
             messages.push(message);
