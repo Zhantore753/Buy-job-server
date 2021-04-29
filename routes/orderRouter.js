@@ -237,7 +237,7 @@ router.get('/get-messages', authMiddleware, async(req, res) => {
         const respond = await Respond.findOne({_id: respondId});
         let messages = [];
         let start = respond.messages.length - skip - 1;
-        let end = respond.messages.length - (15 + +skip) + 1;
+        let end = respond.messages.length - (15 + +skip) - 1;
         let hasMore = true
         if(end < -1){
             end = -1;
