@@ -233,19 +233,21 @@ router.get('/get-responds', authMiddleware, async (req, res) => {
 
 router.get('/get-messages', authMiddleware, async(req, res) => {
     try{
-        const {respondId} = req.query;
+        const {respondId, skip} = req.query;
         const respond = await Respond.findOne({_id: respondId});
         let messages = [];
-        let start = 0;
-        if(respond.messages.length >= 10){
-            start = respond.messages.length - 10
+        let start = respond.messages.length - skip - 1;
+        let end = respond.messages.length - (15 + +skip) + 1;
+        let hasMore = true
+        if(end < -1){
+            end = -1;
+            hasMore = false;
         }
-        console.log(start);
-        for(let i = start; i < respond.messages.length; i++){
+        for(let i = start; i > end; i--){
             const message = await Message.findOne({_id: respond.messages[i]});
             messages.push(message);
         }
-        res.json({messages, message: "Сообщения получены"});
+        res.json({messages, hasMore, message: "Сообщения получены"});
     }catch(e){
         console.log(e);
         res.status(400).json({message: "Ошибка при получении сообщений"});

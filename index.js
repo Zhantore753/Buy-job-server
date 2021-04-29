@@ -58,7 +58,7 @@ io.on('connection', socket => {
 
         await message.save();
         await respond.save();
-
+        
         socket.broadcast.to(room).emit('NEW_MESSAGE', {room, text, user, time, files});
     });
 
