@@ -25,6 +25,7 @@ const staticPathMiddleware = require('./middleware/staticMiddleware');
 const path = require('path');
 const Message = require('./models/Message');
 const Respond = require('./models/Respond');
+const File = require('./models/File');
 
 app.use(siofu.router);
 app.use(fileUpload({}));
@@ -39,7 +40,8 @@ app.use("/api/update", updateRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/user", userRouter);
 
-const messagesFilesPath = path.resolve(__dirname, 'static');
+const messagesFilesPath = path.resolve(__dirname, 'files');
+const socketIdtoUserId = [];
 
 io.on('connection', socket => {
     let uploader = new siofu();
@@ -47,20 +49,52 @@ io.on('connection', socket => {
     uploader.dir = messagesFilesPath;
     uploader.maxFileSize = 2000000;
 
-    uploader.on("saved", function(event, params){
-        console.log(event, params);
+    uploader.on("saved", async function(event){
+        if(event.file.success){
+            console.log(event);
+            const path = event.file.pathName.split('\\');
+            const name = path.pop();
+            const message = new Message({
+                user: socketIdtoUserId[socket.id][0],
+                time: Date.now(),
+                fileName: name,
+                filePath: path.join("\\"),
+            })
+            const file = new File({
+                name: name,
+                path: path.join("\\"),
+                size: event.file.bytesLoaded,
+                user: socketIdtoUserId[socket.id][0],
+                message: message._id
+            });
+            message.file = file._id;
+
+            const respond = await Respond.findOne({_id: socketIdtoUserId[socket.id][1]});
+            respond.messages.push(message);
+            file.save();
+            message.save();
+            respond.save();
+
+            socket.emit('FILE_UPLOAD_SUCCESS', {message: 'Файл был успешно загружен'});
+            socket.broadcast.to(socketIdtoUserId[socket.id][1]).emit('NEW_FILE_MESSAGE', {message, file});
+            socket.emit('NEW_FILE_MESSAGE', {message, file});
+        }else{
+            socket.emit('FILE_UPLOAD_ERROR', 'Произошла не предвиденная ошибка');
+        }
     });
     uploader.on('error', () => {
         console.log('file upload error');
         socket.emit('FILE_UPLOAD_ERROR', 'Файлы должны быть меньше 2Мб');
     });
-    socket.on('ROOM:JOIN', (roomId) => {
+    socket.on('ROOM:JOIN', ({roomId, userId}) => {
         socket.join(roomId);
-        console.log(socket.rooms);
+        socketIdtoUserId[socket.id] = [userId, roomId];
+        console.log(socketIdtoUserId);
     });
     socket.on('ROOM:LEAVE', (roomId) => {
         socket.leave(roomId);
-        console.log(socket.rooms);
+        delete socketIdtoUserId[socket.id]
+        console.log(socketIdtoUserId);
     });
     socket.on('NEW_MESSAGE', async ({room, text, user, time, files}) => {
         const message = new Message({
@@ -80,6 +114,7 @@ io.on('connection', socket => {
     });
 
     socket.on('disconnecting', () => {
+        delete socketIdtoUserId[socket.id]
         // console.log(socket.rooms); // the Set contains at least the socket ID
     });
 

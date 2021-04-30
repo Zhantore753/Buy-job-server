@@ -2,10 +2,12 @@ const {Schema, model, ObjectId} = require('mongoose');
 
 const Message = new Schema({
     room: {type: ObjectId, tef: 'Respond'},
-    text: {type: String, required: true},
+    text: {type: String},
     user: {type: ObjectId, ref: 'User', required: true},
     time: {type: Date, default: Date.now()},
-    files: [{type: ObjectId, ref: 'File'}]
+    file: {type: ObjectId, ref: 'File'},
+    fileName: {type: String},
+    filePath: {type: String}
 });
 
 module.exports = model('Message', Message);
