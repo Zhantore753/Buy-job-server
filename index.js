@@ -2,6 +2,7 @@ const express =require('express');
 const mongoose = require('mongoose');
 const config = require('config');
 const fileUpload = require('express-fileupload');
+const Uuid = require('uuid');
 const authRouter = require('./routes/authRouter');
 const ticketsRouter = require('./routes/ticketsRouter');
 const updateRouter = require('./routes/updateRouter');
@@ -10,6 +11,7 @@ const userRouter = require('./routes/userRouter');
 const PORT = process.env.PORT || config.get('serverPort');
 const app = express();
 const server = require('http').Server(app);
+const siofu = require("socketio-file-upload");
 const io = require('socket.io')(server, {
     cors: {
         origin: '*',
@@ -24,6 +26,7 @@ const path = require('path');
 const Message = require('./models/Message');
 const Respond = require('./models/Respond');
 
+app.use(siofu.router);
 app.use(fileUpload({}));
 app.use(corsMiddleware);
 app.use(staticPathMiddleware(path.resolve(__dirname, 'files')));
@@ -36,7 +39,21 @@ app.use("/api/update", updateRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/user", userRouter);
 
+const messagesFilesPath = path.resolve(__dirname, 'static');
+
 io.on('connection', socket => {
+    let uploader = new siofu();
+    uploader.listen(socket);
+    uploader.dir = messagesFilesPath;
+    uploader.maxFileSize = 2000000;
+
+    uploader.on("saved", function(event, params){
+        console.log(event, params);
+    });
+    uploader.on('error', () => {
+        console.log('file upload error');
+        socket.emit('FILE_UPLOAD_ERROR', 'Файлы должны быть меньше 2Мб');
+    });
     socket.on('ROOM:JOIN', (roomId) => {
         socket.join(roomId);
         console.log(socket.rooms);
