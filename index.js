@@ -112,6 +112,25 @@ io.on('connection', socket => {
 
         socket.broadcast.to(socketIdtoUserId[socket.id][1]).emit('ACCEPT_RESPOND', {order, message: 'Ваше предложение было принято'});
     });
+
+    socket.on('ACCEPT_WORK', async () => {
+        const respond = await Respond.findOne({_id: socketIdtoUserId[socket.id][1]});
+        const order = await Order.findOne({_id: respond.order});
+        const user = await User.findOne({_id: order.user});
+        const executor = await User.findOne({_id: respond.executor});
+
+        user.balance = user.balance - respond.offer;
+        executor.balance = executor.balance + respond.offer;
+
+        respond.status = 'Исполнено';
+        order.status = 'Исполнено';
+        await respond.save();
+        await order.save();
+        await user.save();
+        await executor.save();
+        socket.broadcast.to(socketIdtoUserId[socket.id][1]).emit('ACCEPT_WORK', {order, balance: executor.balance, message: 'Работа была принята'});
+    });
+
     socket.on('NEW_MESSAGE', async ({room, text, user, time, files}) => {
         const message = new Message({
             room,

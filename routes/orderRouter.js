@@ -262,30 +262,6 @@ router.get('/get-messages', authMiddleware, async(req, res) => {
     }
 });
 
-router.post('/access-work', authMiddleware, async(req, res) => {
-    try{
-        const {respondId} = req.body;
-        const respond = await Respond.findOne({_id: respondId});
-        const order = await Order.findOne({_id: respond.order});
-        const user = await User.findOne({_id: order.user});
-        const executor = await User.findOne({_id: respond.executor});
-
-        user.balance = user.balance - respond.offer;
-        executor.balance = executor.balance + respond.offer;
-
-        respond.status = 'Исполнено';
-        order.status = 'Исполнено';
-        await respond.save();
-        await order.save();
-        await user.save();
-        await executor.save();
-        res.json({order, balance: user.balance, message: 'Работа была принята'});
-    }catch(e){
-        console.log(e);
-        res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
-    }
-});
-
 router.get('/get-respond', authMiddleware, async(req, res) => {
     try{
         const {respondId} = req.query;
