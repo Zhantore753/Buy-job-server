@@ -14,7 +14,8 @@ const Order = new Schema({
     files: [{type: ObjectId, ref: 'File'}],
     user: {type: ObjectId, ref: 'User'}, // Заказчик
     responds: [{type: ObjectId, ref: 'Respond'}], // Список всех исполнителей подавших заявку
-    executorRespond: {type: ObjectId, ref: 'Respond'} // Выбраный исполнитель
+    executorRespond: {type: ObjectId, ref: 'Respond'}, // Выбраный исполнитель
+    executor: {type: String}
 });
 
 module.exports = model('Order', Order);
