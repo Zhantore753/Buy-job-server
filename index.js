@@ -25,6 +25,8 @@ const path = require('path');
 const Message = require('./models/Message');
 const Respond = require('./models/Respond');
 const File = require('./models/File');
+const Order = require('./models/Order');
+const User = require('./models/User');
 
 app.use(siofu.router);
 app.use(fileUpload({}));
@@ -93,6 +95,22 @@ io.on('connection', socket => {
         socket.leave(roomId);
         delete socketIdtoUserId[socket.id]
         console.log(socket.rooms)
+    });
+    socket.on('ACCEPT_RESPOND', async () => {
+        const respond = await Respond.findOne({_id: socketIdtoUserId[socket.id][1]});
+        const order = await Order.findOne({_id: respond.order});
+        const executor = await User.findOne({_id: respond.executor});
+        respond.status = 'Выполняется';
+        order.executorRespond = respond._id;
+        order.executor = executor._id;
+        order.status = 'Выполняется';
+        order.price = respond.offer;
+        executor.orders.push(order);
+        await respond.save();
+        await order.save();
+        await executor.save();
+
+        socket.broadcast.to(socketIdtoUserId[socket.id][1]).emit('ACCEPT_RESPOND', {order, message: 'Ваше предложение было принято'});
     });
     socket.on('NEW_MESSAGE', async ({room, text, user, time, files}) => {
         const message = new Message({

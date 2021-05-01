@@ -262,28 +262,6 @@ router.get('/get-messages', authMiddleware, async(req, res) => {
     }
 });
 
-router.post('/access-respond', authMiddleware, async(req, res) => {
-    try{
-        const {respondId} = req.body;
-        const respond = await Respond.findOne({_id: respondId});
-        const order = await Order.findOne({_id: respond.order});
-        const executor = await User.findOne({_id: respond.executor});
-        respond.status = 'Выполняется';
-        order.executorRespond = respond._id;
-        order.executor = executor._id;
-        order.status = 'Выполняется';
-        order.price = respond.offer;
-        executor.orders.push(order);
-        await respond.save();
-        await order.save();
-        await executor.save();
-        res.json({order, message: 'Отклик был одобрен'});
-    }catch(e){
-        console.log(e);
-        res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
-    }
-});
-
 router.post('/access-work', authMiddleware, async(req, res) => {
     try{
         const {respondId} = req.body;
