@@ -167,8 +167,13 @@ router.post('/create-respond', authMiddleware, async (req, res) => {
             findOrder.responds.push(respond._id);
         }
 
+        const user = await User.findOne({_id: req.user.id});
+
+        user.orders.push(respond._id);
+
         await respond.save();
         await findOrder.save();
+        await user.save();
         res.json({respond, message: "Предложение было отправлено"});
     }catch(e){
         console.log(e);
@@ -259,14 +264,41 @@ router.post('/access-respond', authMiddleware, async(req, res) => {
         const {respondId} = req.body;
         const respond = await Respond.findOne({_id: respondId});
         const order = await Order.findOne({_id: respond.order});
+        respond.status = 'Выполняется';
         order.executorRespond = respond._id;
+        order.status = 'Выполняется';
+        await respond.save();
         await order.save();
         res.json({order, message: 'Отклик был одобрен'});
     }catch(e){
         console.log(e);
         res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
     }
-})
+});
+
+router.post('/access-work', authMiddleware, async(req, res) => {
+    try{
+        const {respondId} = req.body;
+        const respond = await Respond.findOne({_id: respondId});
+        const order = await Order.findOne({_id: respond.order});
+        const user = await User.findOne({_id: order.user});
+        const executor = await User.findOne({_id: respond.executor});
+
+        user.balance = user.balance - respond.offer;
+        executor.balance = executor.balance + respond.offer;
+
+        respond.status = 'Исполнено';
+        order.status = 'Исполнено';
+        await respond.save();
+        await order.save();
+        await user.save();
+        await executor.save();
+        res.json({order, balance: user.balance, message: 'Работа была принята'});
+    }catch(e){
+        console.log(e);
+        res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
+    }
+});
 
 router.get('/get-respond', authMiddleware, async(req, res) => {
     try{

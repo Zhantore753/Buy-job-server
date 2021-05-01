@@ -2,7 +2,6 @@ const express =require('express');
 const mongoose = require('mongoose');
 const config = require('config');
 const fileUpload = require('express-fileupload');
-const Uuid = require('uuid');
 const authRouter = require('./routes/authRouter');
 const ticketsRouter = require('./routes/ticketsRouter');
 const updateRouter = require('./routes/updateRouter');
@@ -51,7 +50,6 @@ io.on('connection', socket => {
 
     uploader.on("saved", async function(event){
         if(event.file.success){
-            console.log(event);
             const path = event.file.pathName.split('\\');
             const name = path.pop();
             const message = new Message({
@@ -89,12 +87,12 @@ io.on('connection', socket => {
     socket.on('ROOM:JOIN', ({roomId, userId}) => {
         socket.join(roomId);
         socketIdtoUserId[socket.id] = [userId, roomId];
-        console.log(socketIdtoUserId);
+        console.log(socket.rooms)
     });
     socket.on('ROOM:LEAVE', (roomId) => {
         socket.leave(roomId);
         delete socketIdtoUserId[socket.id]
-        console.log(socketIdtoUserId);
+        console.log(socket.rooms)
     });
     socket.on('NEW_MESSAGE', async ({room, text, user, time, files}) => {
         const message = new Message({
@@ -115,7 +113,6 @@ io.on('connection', socket => {
 
     socket.on('disconnecting', () => {
         delete socketIdtoUserId[socket.id]
-        // console.log(socket.rooms); // the Set contains at least the socket ID
     });
 
     socket.on('disconnect', () => {
