@@ -34,7 +34,7 @@ router.get('/get-user', authMiddleware, async (req, res) => {
             orders: user.orders
         }
 
-        res.json({user, message: "Пользователь найден"});
+        res.json({resUser, message: "Пользователь найден"});
     }catch(e){
         console.log(e);
         return res.status(400).json({message: "Ошибка сервера"});
