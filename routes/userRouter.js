@@ -1,6 +1,7 @@
 const Router = require('express');
 const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
+const Feedback = require('../models/Feedback');
 const User = require("../models/User");
 
 router.get('/user', authMiddleware, async (req, res) => {
@@ -38,6 +39,18 @@ router.get('/get-user', authMiddleware, async (req, res) => {
     }catch(e){
         console.log(e);
         return res.status(400).json({message: "Ошибка сервера"});
+    }
+});
+
+router.get('/feedbacks', authMiddleware, async (req, res) => {
+    try{
+        const {startfrom} = req.query;
+        let response = await Feedback.find({toUser: req.user.id}).skip(+startfrom).limit(10).sort({'date': -1});
+        console.log(response);
+        return res.json(response);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Не удалось получить отзывы"});
     }
 });
 

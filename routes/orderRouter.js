@@ -298,12 +298,14 @@ router.post('/feedback', authMiddleware, async(req, res) => {
             if(order.execFeedback){
                 feedback = await Feedback.findOne({_id: order.execFeedback});
                 feedback.rating = rating;
+                Feedback.date = Date.now();
             }else{
                 feedback = new Feedback({
                     orderId,
                     toUser,
                     fromUser,
-                    rating
+                    rating,
+                    date: Date.now()
                 });
 
                 user.ratings.push(feedback);
@@ -314,12 +316,14 @@ router.post('/feedback', authMiddleware, async(req, res) => {
             if(order.userFeedback){
                 feedback = await Feedback.findOne({_id: order.userFeedback});
                 feedback.rating = rating;
+                Feedback.date = Date.now();
             }else{
                 feedback = new Feedback({
                     orderId,
                     toUser,
                     fromUser,
-                    rating
+                    rating,
+                    date: Date.now()
                 });
 
                 user.ratings.push(feedback);
