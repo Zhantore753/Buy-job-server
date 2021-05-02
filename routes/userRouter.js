@@ -44,8 +44,8 @@ router.get('/get-user', authMiddleware, async (req, res) => {
 
 router.get('/feedbacks', authMiddleware, async (req, res) => {
     try{
-        const {startfrom} = req.query;
-        let response = await Feedback.find({toUser: req.user.id}).skip(+startfrom).limit(10).sort({'date': -1});
+        const {userId, startfrom} = req.query;
+        let response = await Feedback.find({toUser: userId}).skip(+startfrom).limit(10).sort({'date': -1});
         console.log(response);
         return res.json(response);
     }catch(e){
