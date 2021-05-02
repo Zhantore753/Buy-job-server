@@ -346,7 +346,6 @@ router.post('/feedback', authMiddleware, async(req, res) => {
                 });
 
                 await User.populate(users,{'path': '_id'},async function(err,users){
-                    console.log(users[0].avgRating);
                     user.rating = users[0].avgRating;
                     await user.save();
                 });
