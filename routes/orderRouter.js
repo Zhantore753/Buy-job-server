@@ -9,7 +9,6 @@ const fs = require('fs');
 const Respond = require("../models/Respond");
 const Message = require("../models/Message");
 const Feedback = require("../models/Feedback");
-const AvgResult = require("../models/avgRating");
 
 router.post('/create', authMiddleware, async (req, res) =>{
     try {
@@ -341,13 +340,11 @@ router.post('/feedback', authMiddleware, async(req, res) => {
                 }}
             ],
             async function(err, users){
-                users = users.map(function(result){
-                    return new AvgResult(result);
-                });
-
-                await User.populate(users,{'path': '_id'},async function(err,users){
-                    user.rating = users[0].avgRating;
-                    await user.save();
+                users.map(async function(result){
+                    if(JSON.stringify(result._id, undefined, 2) === JSON.stringify(user._id, undefined, 2)){
+                        user.rating = result.avgRating;
+                        await user.save();
+                    }
                 });
             }
         );
