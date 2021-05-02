@@ -353,7 +353,18 @@ router.post('/feedback', authMiddleware, async(req, res) => {
             }
         );
 
-        res.json({rating, message: 'Оценка успешно поставлена'});
+        res.json({feedback, message: 'Оценка успешно поставлена'});
+    }catch(e){
+        console.log(e);
+        res.json({status: 500, message: 'Ошибка сервера'});
+    }
+});
+
+router.get('/get-feedback', authMiddleware, async(req, res) => {
+    try{
+        const {feedbackId} = req.query;
+        const feedback = await Feedback.findOne({_id: feedbackId})
+        res.json({feedback, message: 'Оценка получена'});
     }catch(e){
         console.log(e);
         res.json({status: 500, message: 'Ошибка сервера'});
