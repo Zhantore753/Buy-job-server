@@ -12,6 +12,7 @@ const User = new Schema({
     workTime: {type: Date, default: Date.now()},
     balance: {type: Number,  default: 0},
     balanceHistory: [{type: ObjectId, ref: 'BalanceAction'}],
+    ratings: [{type: ObjectId, ref: 'Feedback'}],
     rating: {type: Number, default: 0, max: 5},
     role: {type: String, enum: ['admin', 'moderator', 'freelancer', 'customer'], required: true},
     eduInstitution: {type: String, default:''},

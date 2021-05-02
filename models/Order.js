@@ -9,7 +9,8 @@ const Order = new Schema({
     keyWords: [{type: String}],
     category: {type: String},
     subject: {type: String},
-    feedback: {type: ObjectId, ref: 'Feedback'},
+    execFeedback: {type: ObjectId, ref: 'Feedback'}, // Отзыв исполнителя
+    userFeedback: {type: ObjectId, ref: 'Feedback'}, // Отзыв заказчика
     status: {type: String, enum: ['Участвует в конкурсе', 'Выполняется', 'Исполнено', 'Заказ отменён'], default: 'Участвует в конкурсе'},
     files: [{type: ObjectId, ref: 'File'}],
     user: {type: ObjectId, ref: 'User'}, // Заказчик

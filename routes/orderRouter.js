@@ -8,6 +8,8 @@ const authMiddleware = require('../middleware/authMiddleware');
 const fs = require('fs');
 const Respond = require("../models/Respond");
 const Message = require("../models/Message");
+const Feedback = require("../models/Feedback");
+const AvgResult = require("../models/avgRating");
 
 router.post('/create', authMiddleware, async (req, res) =>{
     try {
@@ -281,6 +283,80 @@ router.get('/get-respond', authMiddleware, async(req, res) => {
     }catch(e){
         console.log(e);
         res.status(400).json({message: "Ошибка сервера, попробуйте еще раз"});
+    }
+});
+
+router.post('/feedback', authMiddleware, async(req, res) => {
+    try{
+        const {orderId, toUser, fromUser, rating} = req.body;
+
+        const order = await Order.findOne({_id: orderId});
+        const user = await User.findOne({_id: toUser});
+
+        let feedback;
+
+        if(user.role === 'customer'){
+            if(order.execFeedback){
+                feedback = await Feedback.findOne({_id: order.execFeedback});
+                feedback.rating = rating;
+            }else{
+                feedback = new Feedback({
+                    orderId,
+                    toUser,
+                    fromUser,
+                    rating
+                });
+
+                user.ratings.push(feedback);
+                order.execFeedback = feedback;
+            }
+        }
+        if(user.role === 'freelancer'){
+            if(order.userFeedback){
+                feedback = await Feedback.findOne({_id: order.userFeedback});
+                feedback.rating = rating;
+            }else{
+                feedback = new Feedback({
+                    orderId,
+                    toUser,
+                    fromUser,
+                    rating
+                });
+
+                user.ratings.push(feedback);
+                order.userFeedback = feedback;
+            }
+        }
+
+        if(feedback){
+            await feedback.save();
+            await order.save();
+        }
+
+        await Feedback.aggregate(
+            [
+                {'$group':{
+                    '_id': '$toUser',
+                    'avgRating': {'$avg': '$rating'}
+                }}
+            ],
+            async function(err, users){
+                users = users.map(function(result){
+                    return new AvgResult(result);
+                });
+
+                await User.populate(users,{'path': '_id'},async function(err,users){
+                    console.log(users[0].avgRating);
+                    user.rating = users[0].avgRating;
+                    await user.save();
+                });
+            }
+        );
+
+        res.json({rating, message: 'Оценка успешно поставлена'});
+    }catch(e){
+        console.log(e);
+        res.json({status: 500, message: 'Ошибка сервера'});
     }
 });
 
