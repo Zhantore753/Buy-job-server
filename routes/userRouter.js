@@ -71,4 +71,43 @@ router.get('/orders', authMiddleware, async (req, res) => {
     }
 });
 
+router.post('/change-role', authMiddleware, async (req, res) => {
+    try{
+        const {role} = req.body;
+        const user = await User.findOne({_id: req.user.id});
+        user.role = role;
+        await user.save();
+        return res.json({role: user.role, message: "Вы стали исполнителем"});
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Не удалось получить отзывы"});
+    }
+});
+
+router.post('/input-balance', authMiddleware, async (req, res) => {
+    try{
+        const {sum} = req.body;
+        const user = await User.findOne({_id: req.user.id});
+        user.balance = +user.balance + +sum;
+        await user.save();
+        return res.json({balance: user.balance, message: "Баланс успешно пополнен"});
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Ошибка сервера"});
+    }
+});
+
+router.post('/output-balance', authMiddleware, async (req, res) => {
+    try{
+        const {sum} = req.body;
+        const user = await User.findOne({_id: req.user.id});
+        user.balance = +user.balance - +sum;
+        await user.save();
+        return res.json({balance: user.balance, message: "Вывод прошел успешно"});
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Ошибка сервера"});
+    }
+});
+
 module.exports = router;
