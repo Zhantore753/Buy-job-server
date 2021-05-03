@@ -10,7 +10,7 @@ const User = new Schema({
     eduLevel: {type: String, enum: ['Общее', 'Среднее', 'Высшее']},
     avatar: {type: String, default: ''},
     workTime: {type: Date, default: Date.now()},
-    balance: {type: Number,  default: 0},
+    balance: {type: Number,  default: 100000},
     balanceHistory: [{type: ObjectId, ref: 'BalanceAction'}],
     ratings: [{type: ObjectId, ref: 'Feedback'}],
     rating: {type: Number, default: 0, max: 5},
