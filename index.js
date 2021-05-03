@@ -43,6 +43,7 @@ app.use("/api/user", userRouter);
 
 const messagesFilesPath = path.resolve(__dirname, 'files');
 const socketIdtoUserId = [];
+console.log(messagesFilesPath);
 
 io.on('connection', socket => {
     let uploader = new siofu();
