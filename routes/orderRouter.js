@@ -208,7 +208,7 @@ router.post('/update-order', authMiddleware, async (req, res) => {
         order.price = price;
         order.status = status;
         await order.save();
-        res.json({message: "Изменения были сохранены"});
+        res.json({order, message: "Изменения были сохранены"});
     }catch(e){
         console.log(e);
         res.status(400).json({message: "Ошибка при обновлении заказа"});
