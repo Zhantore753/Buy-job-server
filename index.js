@@ -59,11 +59,11 @@ io.on('connection', socket => {
                 user: socketIdtoUserId[socket.id][0],
                 time: Date.now(),
                 fileName: name,
-                filePath: path.join("\\"),
+                filePath: path.join("/"),
             })
             const file = new File({
                 name: name,
-                path: path.join("\\"),
+                path: path.join("/"),
                 size: event.file.bytesLoaded,
                 user: socketIdtoUserId[socket.id][0],
                 message: message._id

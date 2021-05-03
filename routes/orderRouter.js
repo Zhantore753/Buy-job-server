@@ -32,7 +32,7 @@ router.post('/create', authMiddleware, async (req, res) =>{
             for(let i = 0; i < req.files.files.length; i++){
                 const nameSplitted = req.files.files[i].name.split('.');
                 const fileName = Uuid.v4() + '.' + nameSplitted[nameSplitted.length - 1];
-                req.files.files[i].mv(req.filePath + "\\" + fileName);
+                req.files.files[i].mv(req.filePath + "/" + fileName);
                 const file = new File({
                     name: fileName,
                     type: req.files.files[i].mimetype,
@@ -47,7 +47,7 @@ router.post('/create', authMiddleware, async (req, res) =>{
             if(filesId.length < 1){
                 const nameSplitted = req.files.files.name.split('.');
                 const fileName = Uuid.v4() + '.' + nameSplitted[nameSplitted.length - 1];
-                req.files.files.mv(req.filePath + "\\" + fileName);
+                req.files.files.mv(req.filePath + "/" + fileName);
                 const file = new File({
                     name: fileName,
                     type: req.files.files.mimetype,
@@ -136,10 +136,10 @@ router.get('/files', authMiddleware, async (req, res) => {
 router.get('/download', authMiddleware, async (req, res) => {
     try {
         const {path, name} = req.query;
-        if (fs.existsSync(path)) {
+        if (fs.existsSync(path + "/" + name) || fs.existsSync(path)) {
             console.log(path, name)
-            const fullpath = path + "\\" + name;
-            return res.download(path, name);
+            const fullpath = path + "/" + name;
+            return res.download(fullpath);
         }
         return res.status(400).json({message: "Ошибка при скачивании"});
     } catch (e) {
