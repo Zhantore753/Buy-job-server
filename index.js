@@ -52,17 +52,17 @@ io.on('connection', socket => {
 
     uploader.on("saved", async function(event){
         if(event.file.success){
-            const path = event.file.pathName.split('\\');
+            const path = event.file.pathName.split('/');
             const name = path.pop();
             const message = new Message({
                 user: socketIdtoUserId[socket.id][0],
                 time: Date.now(),
                 fileName: name,
-                filePath: path.join("\\"),
+                filePath: path.join("/"),
             })
             const file = new File({
                 name: name,
-                path: path.join("\\"),
+                path: path.join("/"),
                 size: event.file.bytesLoaded,
                 user: socketIdtoUserId[socket.id][0],
                 message: message._id
