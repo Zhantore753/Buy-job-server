@@ -137,7 +137,8 @@ router.get('/download', authMiddleware, async (req, res) => {
     try {
         const {path, name} = req.query;
         if (fs.existsSync(path)) {
-            const fullpath = path + "\\" + name;
+            console.log(path, name)
+            const fullpath = path + "/" + name;
             return res.download(fullpath);
         }
         return res.status(400).json({message: "Ошибка при скачивании"});
