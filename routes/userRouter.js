@@ -3,6 +3,7 @@ const router = new Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const Feedback = require('../models/Feedback');
 const User = require("../models/User");
+const Order = require("../models/Order");
 
 router.get('/user', authMiddleware, async (req, res) => {
     try{
@@ -35,7 +36,7 @@ router.get('/get-user', authMiddleware, async (req, res) => {
             orders: user.orders
         }
 
-        res.json({resUser, message: "Пользователь найден"});
+        return res.json({resUser, message: "Пользователь найден"});
     }catch(e){
         console.log(e);
         return res.status(400).json({message: "Ошибка сервера"});
@@ -45,8 +46,24 @@ router.get('/get-user', authMiddleware, async (req, res) => {
 router.get('/feedbacks', authMiddleware, async (req, res) => {
     try{
         const {userId, startfrom} = req.query;
-        let response = await Feedback.find({toUser: userId}).skip(+startfrom).limit(10).sort({'date': -1});
-        console.log(response);
+        let response = await Feedback.find({toUser: userId}).skip(+startfrom).limit(5).sort({'date': -1});
+        return res.json(response);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({message: "Не удалось получить отзывы"});
+    }
+});
+
+router.get('/orders', authMiddleware, async (req, res) => {
+    try{
+        const {userId, startfrom} = req.query;
+        const user = await User.findOne({_id: userId});
+        let response;
+        if(user.role === 'freelancer'){
+            response = await Order.find({executor: userId}).skip(+startfrom).limit(5).sort({'date': -1});
+        }else{
+            response = await Order.find({user: userId}).skip(+startfrom).limit(5).sort({'date': -1});
+        }
         return res.json(response);
     }catch(e){
         console.log(e);
