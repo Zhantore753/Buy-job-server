@@ -1,7 +1,0 @@
-{
-    "serverPort": 5000,
-    "dbUrl": "mongodb+srv://Zhantore:inju13032011gg@cluster0.xe1q1.mongodb.net/buy-job?retryWrites=true&w=majority",
-    "secretKey": "buy-job-secret",
-    "filePath": "D:\\Жаника - важное\\Портфолио полное\\Cloud-disk\\server\\files",
-    "staticPath": "D:\\Жаника - важное\\Портфолио полное\\Cloud-disk\\server\\static"
-}
